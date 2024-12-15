@@ -15,13 +15,31 @@ import { AppDispatch } from "@/store/store";
 import * as SecureStore from "expo-secure-store";
 import { verifyUser } from "@/store/actions/authAction";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
+import {
+  registerForPushNotificationsAsync,
+  scheduleNotification,
+  startNotificationScheduler,
+} from "@/utils/notifications";
+import { getToken } from "@/utils/tokenHandler";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function HomeScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  const [expoPushToken, setExpoPushToken] = useState("");
+
   useEffect(() => {
     const checkToken = async () => {
       const token = await SecureStore.getItemAsync("authToken");
+
       if (token) {
         // // Optionally validate token here
         // dispatch(verifyUser({ token }));
@@ -29,6 +47,18 @@ export default function HomeScreen() {
       }
     };
     checkToken();
+    const setupNotifications = async () => {
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        // Optionally send this token to your backend for further use
+        console.log("Expo Push Token:", token);
+      }
+      const utoken = await getToken();
+      // Schedule daily notifications with random affirmations
+      await startNotificationScheduler(utoken);
+    };
+
+    setupNotifications(); // Schedule the notification when the app loads
   }, [dispatch]);
   return (
     <SafeAreaProvider>

@@ -4,7 +4,7 @@ import axios from "axios";
 import { Alert } from "react-native"; // Import Alert API
 import { getToken, deleteToken, saveToken } from "@/utils/tokenHandler";
 
-const localhost = "192.168.1.40";
+const localhost = "192.168.31.187";
 export const signInUser = createAsyncThunk(
   "auth/signInUser",
   async (credentials: { email: string; password: string }, { dispatch }) => {
